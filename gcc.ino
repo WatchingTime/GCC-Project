@@ -133,7 +133,7 @@ void recalibrate(){
     ini.l  = gcc.left;       ini.r  = gcc.right;      //gets offset from analog triggers in nuetral
   }else if(gcc.x&&gcc.y&&gcc.start){
     if(c == 0) c = millis();
-    cal = millis()-cal>500;
+    cal = millis()-c>500;
   }else c = 0;
 }
 
