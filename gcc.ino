@@ -37,19 +37,19 @@ Gamecube_Data_t data;
 struct{int8_t ax, ay, cx, cy; uint8_t l, r;}ini;
 bool shield, dolphin=0, off=0, cal=1, button;
 struct{float n, e, eh, el, s, w, se, sw;}g;
-struct{float q1, q2, q3, q4;}quad;
 struct{uint8_t db:5, cr:5;}buf;
+struct{bool u, d, l, r;}perf;
 struct{uint8_t l, r;}ls;
-float r, deg, cr, ref;
 int8_t ax, ay, cx, cy;
+float r, deg, cr;
 uint8_t cycles=3;
 uint16_t mode;
 uint32_t n, c;
 
 void mods(){       //to remove mods delete any lines that you do not want here
   anglesfixed();   //reallocates angles properly based on the given cardinal notches
-  maxvectors();    //snaps sufficiently high cardinal inputs to vectors of 1.0 magnitude of analog stick and c stick 
   perfectangles(); //reduces deadzone of cardinals and gives steepest/shallowest angles when on or near the gate
+  maxvectors();    //snaps sufficiently high cardinal inputs to vectors of 1.0 magnitude of analog stick and c stick 
   shielddrops();   //gives an 8 degree range of shield dropping centered on SW and SE gates
   backdash();      //fixes dashback by imposing a 1 frame buffer upon tilt turn values
   backdashooc();   //allows more leniency for dash back out of crouch
@@ -58,18 +58,23 @@ void mods(){       //to remove mods delete any lines that you do not want here
 } //more mods to come!
 
 void anglesfixed(){
-  ref = deg;
-  if((ref>g.el&&ref<g.n)||ref>g.eh){
-    if(ref>180) ref=(ref-g.eh)*quad.q1;         
-    else        ref=(ref-g.el)*quad.q1;
+  if(deg>g.el&&deg<g.n)      deg = map(deg, g.el, g.n,    0,  90);
+  else if(deg>g.n&&deg<g.w)  deg = map(deg, g.n,  g.w,   90, 180);
+  else if(deg>g.w&&deg<g.s)  deg = map(deg, g.w,  g.s,  180, 270);
+  else if(deg>g.s&&deg<g.eh) deg = map(deg, g.s,  g.eh, 270, 360);
+  else                  deg = map(deg-g.eh, g.el, g.n,    0,  90);
+  perf.u = deg> 73 && deg<107; perf.d = deg>254 && deg<287;
+  perf.l = deg>163 && deg<197; perf.r = deg>343 || deg< 17;
+  gcc.xAxis=128+r*cos(deg/57.3);  gcc.yAxis=128+r*sin(deg/57.3);  
+}
+
+void perfectangles(){
+  if(r>75){
+    if(perf.u){gcc.xAxis = (ax>0)?151:105; gcc.yAxis = 204;}
+    if(perf.r){gcc.yAxis = (ay>0)?151:105; gcc.xAxis = 204;}
+    if(perf.d){gcc.xAxis = (ax>0)?151:105; gcc.yAxis =  52;}
+    if(perf.l){gcc.yAxis = (ay>0)?151:105; gcc.xAxis =  52;}
   }
-  else if(ref>g.n&&ref<g.w) {ref=(ref-g.n)*quad.q2; ref+= 90;}
-  else if(ref>g.w&&ref<g.s) {ref=(ref-g.w)*quad.q3; ref+=180;}
-  else if(ref>g.s&&ref<g.eh){ref=(ref-g.s)*quad.q4; ref+=270;}
-  if(r>1.0){
-    gcc.xAxis = 128+r*cos(ref/57.3);
-    gcc.yAxis = 128+r*sin(ref/57.3);
-  }else{gcc.xAxis=128; gcc.yAxis=128;}
 }
 
 void maxvectors(){
@@ -81,15 +86,6 @@ void maxvectors(){
   }
   if(abs(cx)>75&&abs(cy)<23){gcc.cxAxis = (cx>0)?255:1; gcc.cyAxis = 128;}
   if(abs(cy)>75&&abs(cx)<23){gcc.cyAxis = (cy>0)?255:1; gcc.cxAxis = 128;}
-}
-
-void perfectangles(){
-  if(r>75){
-    if(mid(arc(g.n),6,17.2)){gcc.xAxis = (deg<g.n)               ?151:105; gcc.yAxis = 204;}
-    if(mid(arc(g.e),6,17.2)){gcc.yAxis = (deg-360*(deg>180)>g.el)?151:105; gcc.xAxis = 204;}
-    if(mid(arc(g.s),6,17.2)){gcc.xAxis = (deg>g.s)               ?151:105; gcc.yAxis =  52;}
-    if(mid(arc(g.w),6,17.2)){gcc.yAxis = (deg<g.w)               ?151:105; gcc.xAxis =  52;}
-  }
 }
 
 void shielddrops(){
@@ -156,23 +152,22 @@ void calibration(){
   recalibrate();                                  //allows holding x+y+start for 3 seconds to recalibrate
 }
 
-float ang(float x, float y){return atan(y/x)*57.3+180*(x<0)+360*(y<0&&x>0);} //returns angle in degrees when given x and y components
-float mag(char  x, char  y){return sqrt(sq(x)+sq(y));}                       //returns vector magnitude when given x and y components
-bool  mid(float val, float n1, float n2){return val>n1&&val<n2;}             //returns whether val is between n1 and n2
-float arc(float val){return abs(180-abs(abs(deg-val)-180));}                 //returns length of arc between the deg and val
-int   dis(float val){return abs(fmod(val,90)-90*(fmod(val,90)>45));}         //returns how far off the given angle is from a cardinal
+float ang(float x, float y){return atan2(y,x)*57.3+360*(y<0);}        //returns angle in degrees when given x and y components
+float mag(char  x, char  y){return sqrt(sq(x)+sq(y));}                //returns vector magnitude when given x and y components
+bool  mid(float val, float n1, float n2){return val>n1&&val<n2;}      //returns whether val is between n1 and n2
+float arc(float val){return abs(180-abs(abs(deg-val)-180));}          //returns length of arc between the deg and val
+int   dis(float val){return abs(fmod(val,90)-90*(fmod(val,90)>45));}  //returns how far off the given angle is from a cardinal
+float map(long val, float in, float ix, float on, float ox){return (val-in)*(ox-on)/(ix-in)+on;}
 
 void setup(){
   gcc.origin=0;gcc.errlatch=0;gcc.high1=0;gcc.errstat=0; //init values
   g.n  = ang(n__notch_x_value, n__notch_y_value);        //calculates angle of N notch
   g.e  = ang(e__notch_x_value, e__notch_y_value);        //calculates angle of E notch
-  g.s  = ang(s__notch_x_value, s__notch_y_value)+360;    //calculates angle of S notch
+  g.s  = ang(s__notch_x_value, s__notch_y_value);        //calculates angle of S notch
   g.w  = ang(w__notch_x_value, w__notch_y_value);        //calculates angle of W notch
   g.sw = ang(sw_notch_x_value, sw_notch_y_value);        //calculates angle of SW notch
   g.se = ang(se_notch_x_value, se_notch_y_value);        //calculates angle of SE notch
   g.el = g.e-360*(g.e>180); g.eh = g.e+360*(g.e<180);    //gets east gate in 2 notations
-  quad.q1 = (g.n-g.el)/90.0; quad.q2 = (g.w -g.n)/90.0;  //finds disparity of quadrants 1 and 2
-  quad.q3 = (g.s- g.w)/90.0; quad.q4 = (g.eh-g.s)/90.0;  //finds disparity of quadrants 3 and 4 
   controller.read(); gcc = controller.getReport();       //reads controller once for calibration
   recalibrate();                                         //calibrates the controller for initial plug in
 }
