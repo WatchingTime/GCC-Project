@@ -14,7 +14,7 @@ Path.mkdir(gcc_path / '_out', exist_ok=True)
 build_cmd = [
     str(args.arduino_path / 'arduino-builder'),
     '-hardware', str(args.arduino_path / 'hardware'),
-    '-tools', str(args.arduino_path / 'hardware' / 'tools'),
+    '-tools', str(args.arduino_path / 'hardware/tools'),
     '-tools', str(args.arduino_path / 'tools-builder'),
     '-fqbn', 'arduino:avr:nano:cpu=atmega328',
     '-libraries', 'libraries',
