@@ -17,7 +17,7 @@ build_cmd = [
     '-tools', str(args.arduino_path / 'hardware/tools'),
     '-tools', str(args.arduino_path / 'tools-builder'),
     '-fqbn', 'arduino:avr:nano:cpu=atmega328',
-    '-libraries', 'libraries',
+    '-libraries', str(gcc_path / 'libraries'),
     '-build-path', str(gcc_path / '_out'),
     'gcc.ino',
 ]
