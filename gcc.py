@@ -22,4 +22,5 @@ build_cmd = [
 ]
 if args.verbose:
     build_cmd.insert(-1, '-verbose')
+    print(' '.join(build_cmd))
 subprocess.run(build_cmd)
