@@ -4,6 +4,7 @@ import argparse
 import subprocess
 
 parser = argparse.ArgumentParser()
+parser.add_argument('-p', '--port', required=True)
 parser.add_argument('-v', '--verbose', action='store_true')
 parser.add_argument('arduino_path', type=Path)
 args = parser.parse_args()
@@ -24,3 +25,18 @@ if args.verbose:
     build_cmd.insert(-1, '-verbose')
     print(' '.join(build_cmd))
 subprocess.run(build_cmd)
+
+upload_cmd = [
+    str(args.arduino_path / 'hardware/tools/avr/bin/avrdude'),
+    '-C', str(args.arduino_path / 'hardware/tools/avr/etc/avrdude.conf'),
+    '-p' 'atmega328p',
+    '-c', 'arduino',
+    '-P', args.port,
+    '-b', '57600',
+    '-D',
+    '-U', 'flash:w:%s' % (gcc_path / '_out/gcc.ino.hex'),
+]
+if args.verbose:
+    upload_cmd.append('-v')
+    print(' '.join(upload_cmd))
+subprocess.run(upload_cmd)
