@@ -20,7 +20,7 @@ build_cmd = [
     '-fqbn', 'arduino:avr:nano:cpu=atmega328',
     '-libraries', str(gcc_path / 'libraries'),
     '-build-path', str(gcc_path / '_out'),
-    'gcc.ino',
+    'src/gcc.ino',
 ]
 if args.verbose:
     build_cmd.insert(-1, '-verbose')
