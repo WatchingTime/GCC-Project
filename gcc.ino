@@ -3,24 +3,24 @@
 // This section is for user inputted data to make the code personalized to the particular controller
 
 // Enter values of cardinals here (be cognizant of signs)
-#define n__notch_x_value -0.0000
-#define n__notch_y_value  0.0000
+#define N_NOTCH_X -0.0000
+#define N_NOTCH_Y  0.0000
 
-#define e__notch_x_value  0.0000
-#define e__notch_y_value -0.0000
+#define E_NOTCH_X  0.0000
+#define E_NOTCH_Y -0.0000
 
-#define s__notch_x_value -0.0000
-#define s__notch_y_value -0.0000
+#define S_NOTCH_X -0.0000
+#define S_NOTCH_Y -0.0000
 
-#define w__notch_x_value -0.0000
-#define w__notch_y_value -0.0000
+#define W_NOTCH_X -0.0000
+#define W_NOTCH_Y -0.0000
 
 // enter values for shield drop notches here
-#define sw_notch_x_value -0.0000
-#define sw_notch_y_value -0.0000
+#define SW_NOTCH_X -0.0000
+#define SW_NOTCH_Y -0.0000
 
-#define se_notch_x_value  0.0000
-#define se_notch_y_value -0.0000
+#define SE_NOTCH_X  0.0000
+#define SE_NOTCH_Y -0.0000
 
 // once you have installed the mod, upload the code and go to live analog inputs display
 // hold dpad down for 3 seconds to turn off the mod then record the notch values
@@ -296,12 +296,12 @@ float map(long val, float in, float ix, float on, float ox) {return (val-in)*(ox
 void setup()
 {
     gcc.origin = gcc.errlatch = gcc.high1 = gcc.errstat = 0; // init values
-    g.n  = ang(n__notch_x_value, n__notch_y_value);          // calculates angle of N notch
-    g.e  = ang(e__notch_x_value, e__notch_y_value);          // calculates angle of E notch
-    g.s  = ang(s__notch_x_value, s__notch_y_value);          // calculates angle of S notch
-    g.w  = ang(w__notch_x_value, w__notch_y_value);          // calculates angle of W notch
-    g.sw = ang(sw_notch_x_value, sw_notch_y_value);          // calculates angle of SW notch
-    g.se = ang(se_notch_x_value, se_notch_y_value);          // calculates angle of SE notch
+    g.n = ang(N_NOTCH_X, N_NOTCH_Y);          // calculates angle of N notch
+    g.e = ang(E_NOTCH_X, E_NOTCH_Y);          // calculates angle of E notch
+    g.s = ang(S_NOTCH_X, S_NOTCH_Y);          // calculates angle of S notch
+    g.w = ang(W_NOTCH_X, W_NOTCH_Y);          // calculates angle of W notch
+    g.sw = ang(SW_NOTCH_X, SW_NOTCH_Y);       // calculates angle of SW notch
+    g.se = ang(SE_NOTCH_X, SE_NOTCH_Y);       // calculates angle of SE notch
     g.el = g.e-360*(g.e > 180); g.eh = g.e+360*(g.e < 180);  // gets east gate in 2 notations
     controller.read(); gcc = controller.getReport();         // reads controller once for calibration
     recalibrate();                                           // calibrates the controller for initial plug in
