@@ -33,17 +33,40 @@ CGamecubeController controller(0); // sets RX0 on arduino to read data from cont
 CGamecubeConsole console(1);       // sets TX1 on arduino to write data to console
 Gamecube_Report_t gcc;             // structure for controller state
 Gamecube_Data_t data;
-struct {int8_t ax, ay, cx, cy; uint8_t l, r;}ini;
+
 bool shield, dolphin = 0, off = 0, cal = 1, button;
-struct {float n, e, eh, el, s, w, se, sw;} g;
-struct {uint8_t db:5, cr:5;}buf;
-struct {bool u, d, l, r;}perf;
-struct {uint8_t l, r;}ls;
 int8_t ax, ay, cx, cy;
 float r, deg, cr;
 uint8_t cycles = 3;
 uint16_t mode;
 uint32_t n, c;
+
+struct
+{
+    int8_t ax, ay, cx, cy;
+    uint8_t l, r;
+} ini;
+
+struct
+{
+    float n, e, eh, el, s, w, se, sw;
+} g;
+
+struct
+{
+    uint8_t db : 5
+    uint8_t cr : 5;
+} buf;
+
+struct
+{
+    bool u, d, l, r;
+} perf;
+
+struct
+{
+    uint8_t l, r;
+} ls;
 
 void mods()          // to remove mods delete any lines that you do not want here
 {
