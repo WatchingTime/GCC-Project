@@ -83,13 +83,13 @@ static void mods()          // to remove mods delete any lines that you do not w
 static void anglesfixed()
 {
     if (deg > g.el && deg < g.n)
-        deg = map(deg, g.el, g.n,  0,  90);
+        deg = map(deg, g.el, g.n, 0, 90);
     else if (deg > g.n && deg < g.w)
-        deg = map(deg, g.n,  g.w,  90, 180);
+        deg = map(deg, g.n, g.w, 90, 180);
     else if (deg > g.w && deg < g.s)
-        deg = map(deg, g.w,  g.s,  180, 270);
+        deg = map(deg, g.w, g.s, 180, 270);
     else if (deg > g.s && deg < g.eh)
-        deg = map(deg, g.s,  g.eh, 270, 360);
+        deg = map(deg, g.s, g.eh, 270, 360);
     else
         deg = map(deg-g.eh, g.el, g.n, 0, 90);
     perf.u = deg > 73 && deg < 107;
@@ -122,7 +122,7 @@ static void perfectangles()
         if (perf.l)
         {
             gcc.yAxis = (ay > 0) ? 151 : 105;
-            gcc.xAxis =  52;
+            gcc.xAxis = 52;
         }
     }
 }
