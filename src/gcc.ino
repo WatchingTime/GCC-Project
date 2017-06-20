@@ -227,7 +227,7 @@ static void dolphinfix()
         gcc.xAxis = 128;
         gcc.yAxis = 128;
     }
-    if (mag(cx,cy) < 8)
+    if (mag(cx, cy) < 8)
     {
         gcc.cxAxis = 128;
         gcc.cyAxis = 128;
@@ -272,25 +272,25 @@ static void recalibrate()
 
 static void calibration()
 {
-    ax = constrain(gcc.xAxis -128-ini.ax,-128,127); // offsets from neutral position of analog stick x axis
-    ay = constrain(gcc.yAxis -128-ini.ay,-128,127); // offsets from neutral position of analog stick y axis
-    cx = constrain(gcc.cxAxis-128-ini.cx,-128,127); // offsets from neutral position of c stick x axis
-    cy = constrain(gcc.cyAxis-128-ini.cy,-128,127); // offsets from neutral position of c stick y axis
+    ax = constrain(gcc.xAxis -128-ini.ax, -128, 127); // offsets from neutral position of analog stick x axis
+    ay = constrain(gcc.yAxis -128-ini.ay, -128, 127); // offsets from neutral position of analog stick y axis
+    cx = constrain(gcc.cxAxis-128-ini.cx, -128, 127); // offsets from neutral position of c stick x axis
+    cy = constrain(gcc.cyAxis-128-ini.cy, -128, 127); // offsets from neutral position of c stick y axis
     r  = mag(ax, ay); deg = ang(ax, ay);            // obtains polar coordinates for analog stick
     cr = mag(cx, cy);                               // obtains magnitude of c stick value
-    ls.l = constrain(gcc.left -ini.l,0,255);        // fixes left trigger calibration
-    ls.r = constrain(gcc.right-ini.r,0,255);        // fixes right trigger calibration
+    ls.l = constrain(gcc.left -ini.l, 0, 255);        // fixes left trigger calibration
+    ls.r = constrain(gcc.right-ini.r, 0, 255);        // fixes right trigger calibration
     gcc.left = ls.l; gcc.right = ls.r;              // sets proper analog shield values
     gcc.xAxis  = 128+ax; gcc.yAxis  = 128+ay;       // reports analog stick values
     gcc.cxAxis = 128+cx; gcc.cyAxis = 128+cy;       // reports c stick values
     recalibrate();                                  // allows holding x+y+start for 3 seconds to recalibrate
 }
 
-static float ang(float x, float y) {return atan2(y,x)*57.3+360*(y < 0);}         // returns angle in degrees when given x and y components
+static float ang(float x, float y) {return atan2(y, x)*57.3+360*(y < 0);}         // returns angle in degrees when given x and y components
 static float mag(char  x, char  y) {return sqrt(sq(x)+sq(y));}                   // returns vector magnitude when given x and y components
 static bool  mid(float val, float n1, float n2) {return val > n1 && val < n2;}   // returns whether val is between n1 and n2
 static float arc(float val) {return abs(180-abs(abs(deg-val)-180));}             // returns length of arc between the deg and val
-static int   dis(float val) {return abs(fmod(val,90)-90*(fmod(val,90)> 45));}    // returns how far off the given angle is from a cardinal
+static int   dis(float val) {return abs(fmod(val, 90)-90*(fmod(val, 90)> 45));}    // returns how far off the given angle is from a cardinal
 static float map(long val, float in, float ix, float on, float ox) {return (val-in)*(ox-on)/(ix-in)+on;}
 
 void setup()
