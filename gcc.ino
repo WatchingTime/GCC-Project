@@ -54,7 +54,7 @@ struct
 
 struct
 {
-    uint8_t db : 5
+    uint8_t db : 5;
     uint8_t cr : 5;
 } buf;
 
