@@ -2,10 +2,12 @@
 from pathlib import Path
 import argparse
 import subprocess
+import sys
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-p', '--port', required=True)
+parser.add_argument('-p', '--port')
 parser.add_argument('-v', '--verbose', action='store_true')
+parser.add_argument('-u', '--upload', action='store_true')
 parser.add_argument('arduino_path', type=Path)
 args = parser.parse_args()
 
@@ -26,6 +28,8 @@ if args.verbose:
     print(' '.join(build_cmd))
 subprocess.run(build_cmd)
 
+if not args.upload:
+    sys.exit()
 upload_cmd = [
     str(args.arduino_path / 'hardware/tools/avr/bin/avrdude'),
     '-C', str(args.arduino_path / 'hardware/tools/avr/etc/avrdude.conf'),
