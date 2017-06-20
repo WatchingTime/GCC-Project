@@ -34,7 +34,7 @@ CGamecubeConsole console(1);       // sets TX1 on arduino to write data to conso
 Gamecube_Report_t gcc;             // structure for controller state
 Gamecube_Data_t data;
 
-bool shield, dolphin = 0, off = 0, cal = 1, button;
+bool shield, dolphin, off, cal = 1, button;
 int8_t ax, ay, cx, cy;
 float r, deg, cr;
 uint8_t cycles = 3;
