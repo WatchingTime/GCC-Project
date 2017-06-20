@@ -34,7 +34,7 @@ upload_cmd = [
     '-P', args.port,
     '-b', '57600',
     '-D',
-    '-U', 'flash:w:%s' % (gcc_path / '_out/gcc.ino.hex'),
+    '-U', 'flash:w:%s:i' % (gcc_path / '_out/gcc.ino.hex'),
 ]
 if args.verbose:
     upload_cmd.append('-v')
