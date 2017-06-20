@@ -256,9 +256,9 @@ void recalibrate()
     if (cal)
     {
         cal = gcc.x && gcc.y && gcc.start;
-        ini.ax = gcc.xAxis -128; ini.ay = gcc.yAxis -128; // gets offset from analog stick in nuetral
-        ini.cx = gcc.cxAxis-128; ini.cy = gcc.cyAxis-128; // gets offset from c stick in nuetral
-        ini.l  = gcc.left;           ini.r  = gcc.right;  // gets offset from analog triggers in nuetral
+        ini.ax = gcc.xAxis -128; ini.ay = gcc.yAxis -128; // gets offset from analog stick in neutral
+        ini.cx = gcc.cxAxis-128; ini.cy = gcc.cyAxis-128; // gets offset from c stick in neutral
+        ini.l  = gcc.left;           ini.r  = gcc.right;  // gets offset from analog triggers in neutral
     }
     else if (gcc.x && gcc.y && gcc.start)
     {
@@ -272,10 +272,10 @@ void recalibrate()
 
 void calibration()
 {
-    ax = constrain(gcc.xAxis -128-ini.ax,-128,127); // offsets from nuetral position of analog stick x axis
-    ay = constrain(gcc.yAxis -128-ini.ay,-128,127); // offsets from nuetral position of analog stick y axis
-    cx = constrain(gcc.cxAxis-128-ini.cx,-128,127); // offsets from nuetral position of c stick x axis
-    cy = constrain(gcc.cyAxis-128-ini.cy,-128,127); // offsets from nuetral position of c stick y axis
+    ax = constrain(gcc.xAxis -128-ini.ax,-128,127); // offsets from neutral position of analog stick x axis
+    ay = constrain(gcc.yAxis -128-ini.ay,-128,127); // offsets from neutral position of analog stick y axis
+    cx = constrain(gcc.cxAxis-128-ini.cx,-128,127); // offsets from neutral position of c stick x axis
+    cy = constrain(gcc.cyAxis-128-ini.cy,-128,127); // offsets from neutral position of c stick y axis
     r  = mag(ax, ay); deg = ang(ax, ay);            // obtains polar coordinates for analog stick
     cr = mag(cx, cy);                               // obtains magnitude of c stick value
     ls.l = constrain(gcc.left -ini.l,0,255);        // fixes left trigger calibration
