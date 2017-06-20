@@ -286,12 +286,12 @@ static void calibration()
     recalibrate();                                  // allows holding x+y+start for 3 seconds to recalibrate
 }
 
-static float ang(float x, float y) {return atan2(y, x)*57.3+360*(y < 0);}         // returns angle in degrees when given x and y components
-static float mag(char  x, char  y) {return sqrt(sq(x)+sq(y));}                   // returns vector magnitude when given x and y components
-static bool  mid(float val, float n1, float n2) {return val > n1 && val < n2;}   // returns whether val is between n1 and n2
-static float arc(float val) {return abs(180-abs(abs(deg-val)-180));}             // returns length of arc between the deg and val
-static int   dis(float val) {return abs(fmod(val, 90)-90*(fmod(val, 90)> 45));}    // returns how far off the given angle is from a cardinal
-static float map(long val, float in, float ix, float on, float ox) {return (val-in)*(ox-on)/(ix-in)+on;}
+static float ang(float x, float y) { return atan2(y, x)*57.3 + 360*(y < 0); }        // returns angle in degrees when given x and y components
+static float mag(char x, char y) { return sqrt(sq(x) + sq(y)); }                     // returns vector magnitude when given x and y components
+static bool  mid(float val, float n1, float n2) { return val > n1 && val < n2; }     // returns whether val is between n1 and n2
+static float arc(float val) { return abs(180 - abs(abs(deg-val) - 180)); }           // returns length of arc between the deg and val
+static int   dis(float val) { return abs(fmod(val, 90) - 90*(fmod(val, 90) > 45)); } // returns how far off the given angle is from a cardinal
+static float map(long val, float in, float ix, float on, float ox) { return (val-in)*(ox-on)/(ix-in)+on; }
 
 void setup()
 {
