@@ -29,9 +29,9 @@
 // to return to a stock controller hold dpad down for 3 seconds
 // to set to dolphin mode hold dpad up for 3 seconds
 
-CGamecubeController controller(0); //sets RX0 on arduino to read data from controller
-CGamecubeConsole console(1);       //sets TX1 on arduino to write data to console
-Gamecube_Report_t gcc;             //structure for controller state
+CGamecubeController controller(0); // sets RX0 on arduino to read data from controller
+CGamecubeConsole console(1);       // sets TX1 on arduino to write data to console
+Gamecube_Report_t gcc;             // structure for controller state
 Gamecube_Data_t data;
 struct {int8_t ax, ay, cx, cy; uint8_t l, r;}ini;
 bool shield, dolphin = 0, off = 0, cal = 1, button;
@@ -45,17 +45,17 @@ uint8_t cycles = 3;
 uint16_t mode;
 uint32_t n, c;
 
-void mods()          //to remove mods delete any lines that you do not want here
+void mods()          // to remove mods delete any lines that you do not want here
 {
-    anglesfixed();   //reallocates angles properly based on the given cardinal notches
-    perfectangles(); //reduces deadzone of cardinals and gives steepest/shallowest angles when on or near the gate
-    maxvectors();    //snaps sufficiently high cardinal inputs to vectors of 1.0 magnitude of analog stick and c stick
-    shielddrops();   //gives an 8 degree range of shield dropping centered on SW and SE gates
-    backdash();      //fixes dashback by imposing a 1 frame buffer upon tilt turn values
-    backdashooc();   //allows more leniency for dash back out of crouch
-    dolphinfix();    //ensures close to 0 values are reported as 0 on the sticks to fix dolphin calibration and fixes poll speed issues
-    nocode();        //function to disable all code if dpad down is held for 3 seconds (unplug controller to reactivate)
-} //more mods to come!
+    anglesfixed();   // reallocates angles properly based on the given cardinal notches
+    perfectangles(); // reduces deadzone of cardinals and gives steepest/shallowest angles when on or near the gate
+    maxvectors();    // snaps sufficiently high cardinal inputs to vectors of 1.0 magnitude of analog stick and c stick
+    shielddrops();   // gives an 8 degree range of shield dropping centered on SW and SE gates
+    backdash();      // fixes dashback by imposing a 1 frame buffer upon tilt turn values
+    backdashooc();   // allows more leniency for dash back out of crouch
+    dolphinfix();    // ensures close to 0 values are reported as 0 on the sticks to fix dolphin calibration and fixes poll speed issues
+    nocode();        // function to disable all code if dpad down is held for 3 seconds (unplug controller to reactivate)
+} // more mods to come!
 
 void anglesfixed()
 {
@@ -233,9 +233,9 @@ void recalibrate()
     if (cal)
     {
         cal = gcc.x && gcc.y && gcc.start;
-        ini.ax = gcc.xAxis -128; ini.ay = gcc.yAxis -128; //gets offset from analog stick in nuetral
-        ini.cx = gcc.cxAxis-128; ini.cy = gcc.cyAxis-128; //gets offset from c stick in nuetral
-        ini.l  = gcc.left;           ini.r  = gcc.right;  //gets offset from analog triggers in nuetral
+        ini.ax = gcc.xAxis -128; ini.ay = gcc.yAxis -128; // gets offset from analog stick in nuetral
+        ini.cx = gcc.cxAxis-128; ini.cy = gcc.cyAxis-128; // gets offset from c stick in nuetral
+        ini.l  = gcc.left;           ini.r  = gcc.right;  // gets offset from analog triggers in nuetral
     }
     else if (gcc.x && gcc.y && gcc.start)
     {
@@ -249,49 +249,49 @@ void recalibrate()
 
 void calibration()
 {
-    ax = constrain(gcc.xAxis -128-ini.ax,-128,127); //offsets from nuetral position of analog stick x axis
-    ay = constrain(gcc.yAxis -128-ini.ay,-128,127); //offsets from nuetral position of analog stick y axis
-    cx = constrain(gcc.cxAxis-128-ini.cx,-128,127); //offsets from nuetral position of c stick x axis
-    cy = constrain(gcc.cyAxis-128-ini.cy,-128,127); //offsets from nuetral position of c stick y axis
-    r  = mag(ax, ay); deg = ang(ax, ay);            //obtains polar coordinates for analog stick
-    cr = mag(cx, cy);                               //obtains magnitude of c stick value
-    ls.l = constrain(gcc.left -ini.l,0,255);        //fixes left trigger calibration
-    ls.r = constrain(gcc.right-ini.r,0,255);        //fixes right trigger calibration
-    gcc.left = ls.l; gcc.right = ls.r;              //sets proper analog shield values
-    gcc.xAxis  = 128+ax; gcc.yAxis  = 128+ay;       //reports analog stick values
-    gcc.cxAxis = 128+cx; gcc.cyAxis = 128+cy;       //reports c stick values
-    recalibrate();                                  //allows holding x+y+start for 3 seconds to recalibrate
+    ax = constrain(gcc.xAxis -128-ini.ax,-128,127); // offsets from nuetral position of analog stick x axis
+    ay = constrain(gcc.yAxis -128-ini.ay,-128,127); // offsets from nuetral position of analog stick y axis
+    cx = constrain(gcc.cxAxis-128-ini.cx,-128,127); // offsets from nuetral position of c stick x axis
+    cy = constrain(gcc.cyAxis-128-ini.cy,-128,127); // offsets from nuetral position of c stick y axis
+    r  = mag(ax, ay); deg = ang(ax, ay);            // obtains polar coordinates for analog stick
+    cr = mag(cx, cy);                               // obtains magnitude of c stick value
+    ls.l = constrain(gcc.left -ini.l,0,255);        // fixes left trigger calibration
+    ls.r = constrain(gcc.right-ini.r,0,255);        // fixes right trigger calibration
+    gcc.left = ls.l; gcc.right = ls.r;              // sets proper analog shield values
+    gcc.xAxis  = 128+ax; gcc.yAxis  = 128+ay;       // reports analog stick values
+    gcc.cxAxis = 128+cx; gcc.cyAxis = 128+cy;       // reports c stick values
+    recalibrate();                                  // allows holding x+y+start for 3 seconds to recalibrate
 }
 
-float ang(float x, float y) {return atan2(y,x)*57.3+360*(y < 0);}         //returns angle in degrees when given x and y components
-float mag(char  x, char  y) {return sqrt(sq(x)+sq(y));}                   //returns vector magnitude when given x and y components
-bool  mid(float val, float n1, float n2) {return val > n1 && val < n2;}   //returns whether val is between n1 and n2
-float arc(float val) {return abs(180-abs(abs(deg-val)-180));}             //returns length of arc between the deg and val
-int   dis(float val) {return abs(fmod(val,90)-90*(fmod(val,90)> 45));}    //returns how far off the given angle is from a cardinal
+float ang(float x, float y) {return atan2(y,x)*57.3+360*(y < 0);}         // returns angle in degrees when given x and y components
+float mag(char  x, char  y) {return sqrt(sq(x)+sq(y));}                   // returns vector magnitude when given x and y components
+bool  mid(float val, float n1, float n2) {return val > n1 && val < n2;}   // returns whether val is between n1 and n2
+float arc(float val) {return abs(180-abs(abs(deg-val)-180));}             // returns length of arc between the deg and val
+int   dis(float val) {return abs(fmod(val,90)-90*(fmod(val,90)> 45));}    // returns how far off the given angle is from a cardinal
 float map(long val, float in, float ix, float on, float ox) {return (val-in)*(ox-on)/(ix-in)+on;}
 
 void setup()
 {
-    gcc.origin = gcc.errlatch = gcc.high1 = gcc.errstat = 0; //init values
-    g.n  = ang(n__notch_x_value, n__notch_y_value);          //calculates angle of N notch
-    g.e  = ang(e__notch_x_value, e__notch_y_value);          //calculates angle of E notch
-    g.s  = ang(s__notch_x_value, s__notch_y_value);          //calculates angle of S notch
-    g.w  = ang(w__notch_x_value, w__notch_y_value);          //calculates angle of W notch
-    g.sw = ang(sw_notch_x_value, sw_notch_y_value);          //calculates angle of SW notch
-    g.se = ang(se_notch_x_value, se_notch_y_value);          //calculates angle of SE notch
-    g.el = g.e-360*(g.e > 180); g.eh = g.e+360*(g.e < 180);  //gets east gate in 2 notations
-    controller.read(); gcc = controller.getReport();         //reads controller once for calibration
-    recalibrate();                                           //calibrates the controller for initial plug in
+    gcc.origin = gcc.errlatch = gcc.high1 = gcc.errstat = 0; // init values
+    g.n  = ang(n__notch_x_value, n__notch_y_value);          // calculates angle of N notch
+    g.e  = ang(e__notch_x_value, e__notch_y_value);          // calculates angle of E notch
+    g.s  = ang(s__notch_x_value, s__notch_y_value);          // calculates angle of S notch
+    g.w  = ang(w__notch_x_value, w__notch_y_value);          // calculates angle of W notch
+    g.sw = ang(sw_notch_x_value, sw_notch_y_value);          // calculates angle of SW notch
+    g.se = ang(se_notch_x_value, se_notch_y_value);          // calculates angle of SE notch
+    g.el = g.e-360*(g.e > 180); g.eh = g.e+360*(g.e < 180);  // gets east gate in 2 notations
+    controller.read(); gcc = controller.getReport();         // reads controller once for calibration
+    recalibrate();                                           // calibrates the controller for initial plug in
 }
 
 void loop()
 {
-    controller.read();                          //reads the controller
-    data = defaultGamecubeData;                 //this line is necessary for proper rumble
-    gcc = controller.getReport();               //gets a report of the controller read
-    calibration(); recalibrate();               //fixes normal calibration and allows resetting with x+y+start
+    controller.read();                          // reads the controller
+    data = defaultGamecubeData;                 // this line is necessary for proper rumble
+    gcc = controller.getReport();               // gets a report of the controller read
+    calibration(); recalibrate();               // fixes normal calibration and allows resetting with x+y+start
     if (!off)
         mods();                                 // implements all the mods (remove this to unmod the controller)
-    data.report = gcc; console.write(data);     //sends controller data to the console
-    controller.setRumble(data.status.rumble);   //allows for rumble
+    data.report = gcc; console.write(data);     // sends controller data to the console
+    controller.setRumble(data.status.rumble);   // allows for rumble
 }
