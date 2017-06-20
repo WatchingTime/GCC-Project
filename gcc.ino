@@ -68,7 +68,7 @@ struct
     uint8_t l, r;
 } ls;
 
-void mods()          // to remove mods delete any lines that you do not want here
+static void mods()          // to remove mods delete any lines that you do not want here
 {
     anglesfixed();   // reallocates angles properly based on the given cardinal notches
     perfectangles(); // reduces deadzone of cardinals and gives steepest/shallowest angles when on or near the gate
@@ -80,7 +80,7 @@ void mods()          // to remove mods delete any lines that you do not want her
     nocode();        // function to disable all code if dpad down is held for 3 seconds (unplug controller to reactivate)
 } // more mods to come!
 
-void anglesfixed()
+static void anglesfixed()
 {
     if (deg > g.el && deg < g.n)
         deg = map(deg, g.el, g.n,  0,  90);
@@ -100,7 +100,7 @@ void anglesfixed()
     gcc.yAxis = 128 + r * sin(deg / 57.3);
 }
 
-void perfectangles()
+static void perfectangles()
 {
     if (r > 75)
     {
@@ -127,7 +127,7 @@ void perfectangles()
     }
 }
 
-void maxvectors()
+static void maxvectors()
 {
     if (r > 75)
     {
@@ -164,7 +164,7 @@ void maxvectors()
     }
 }
 
-void shielddrops()
+static void shielddrops()
 {
     shield = gcc.l || gcc.r || ls.l > 74 || ls.r > 74 || gcc.z;
     if (shield)
@@ -185,7 +185,7 @@ void shielddrops()
     }
 }
 
-void backdash()
+static void backdash()
 {
     button = gcc.a || gcc.b || gcc.x || gcc.y || gcc.z || gcc.l || gcc.r || ls.l > 74 || ls.r > 74;
     if (abs(ay) < 23 && !button)
@@ -203,7 +203,7 @@ void backdash()
         buf.db = 0;
 }
 
-void backdashooc()
+static void backdashooc()
 {
     if (ay < 23)
     {
@@ -220,7 +220,7 @@ void backdashooc()
         buf.cr = 0;
 }
 
-void dolphinfix()
+static void dolphinfix()
 {
     if (r < 8)
     {
@@ -239,7 +239,7 @@ void dolphinfix()
     cycles = 3 + (16*dolphin);
 }
 
-void nocode()
+static void nocode()
 {
     if (gcc.ddown)
     {
@@ -251,7 +251,7 @@ void nocode()
         n = 0;
 }
 
-void recalibrate()
+static void recalibrate()
 {
     if (cal)
     {
@@ -270,7 +270,7 @@ void recalibrate()
         c = 0;
 }
 
-void calibration()
+static void calibration()
 {
     ax = constrain(gcc.xAxis -128-ini.ax,-128,127); // offsets from neutral position of analog stick x axis
     ay = constrain(gcc.yAxis -128-ini.ay,-128,127); // offsets from neutral position of analog stick y axis
@@ -286,12 +286,12 @@ void calibration()
     recalibrate();                                  // allows holding x+y+start for 3 seconds to recalibrate
 }
 
-float ang(float x, float y) {return atan2(y,x)*57.3+360*(y < 0);}         // returns angle in degrees when given x and y components
-float mag(char  x, char  y) {return sqrt(sq(x)+sq(y));}                   // returns vector magnitude when given x and y components
-bool  mid(float val, float n1, float n2) {return val > n1 && val < n2;}   // returns whether val is between n1 and n2
-float arc(float val) {return abs(180-abs(abs(deg-val)-180));}             // returns length of arc between the deg and val
-int   dis(float val) {return abs(fmod(val,90)-90*(fmod(val,90)> 45));}    // returns how far off the given angle is from a cardinal
-float map(long val, float in, float ix, float on, float ox) {return (val-in)*(ox-on)/(ix-in)+on;}
+static float ang(float x, float y) {return atan2(y,x)*57.3+360*(y < 0);}         // returns angle in degrees when given x and y components
+static float mag(char  x, char  y) {return sqrt(sq(x)+sq(y));}                   // returns vector magnitude when given x and y components
+static bool  mid(float val, float n1, float n2) {return val > n1 && val < n2;}   // returns whether val is between n1 and n2
+static float arc(float val) {return abs(180-abs(abs(deg-val)-180));}             // returns length of arc between the deg and val
+static int   dis(float val) {return abs(fmod(val,90)-90*(fmod(val,90)> 45));}    // returns how far off the given angle is from a cardinal
+static float map(long val, float in, float ix, float on, float ox) {return (val-in)*(ox-on)/(ix-in)+on;}
 
 void setup()
 {
