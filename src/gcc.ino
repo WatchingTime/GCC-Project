@@ -91,7 +91,7 @@ static void anglesfixed()
     else if (deg > g.s && deg < g.eh)
         deg = map(deg, g.s, g.eh, 270, 360);
     else
-        deg = map(deg-g.eh, g.el, g.n, 0, 90);
+        deg = map(deg - g.eh, g.el, g.n, 0, 90);
     perf.u = deg > 73 && deg < 107;
     perf.d = deg > 254 && deg < 287;
     perf.l = deg > 163 && deg < 197;
@@ -256,9 +256,12 @@ static void recalibrate()
     if (cal)
     {
         cal = gcc.x && gcc.y && gcc.start;
-        ini.ax = gcc.xAxis -128; ini.ay = gcc.yAxis -128; // gets offset from analog stick in neutral
-        ini.cx = gcc.cxAxis-128; ini.cy = gcc.cyAxis-128; // gets offset from c stick in neutral
-        ini.l  = gcc.left;           ini.r  = gcc.right;  // gets offset from analog triggers in neutral
+        ini.ax = gcc.xAxis - 128; // gets offset from analog stick in neutral
+        ini.ay = gcc.yAxis - 128;
+        ini.cx = gcc.cxAxis - 128; // gets offset from c stick in neutral
+        ini.cy = gcc.cyAxis - 128;
+        ini.l = gcc.left; // gets offset from analog triggers in neutral
+        ini.r = gcc.right;
     }
     else if (gcc.x && gcc.y && gcc.start)
     {
@@ -276,14 +279,18 @@ static void calibration()
     ay = constrain(gcc.yAxis  - 128 - ini.ay, -128, 127); // offsets from neutral position of analog stick y axis
     cx = constrain(gcc.cxAxis - 128 - ini.cx, -128, 127); // offsets from neutral position of c stick x axis
     cy = constrain(gcc.cyAxis - 128 - ini.cy, -128, 127); // offsets from neutral position of c stick y axis
-    r  = mag(ax, ay); deg = ang(ax, ay);            // obtains polar coordinates for analog stick
+    r = mag(ax, ay); // obtains polar coordinates for analog stick
+    deg = ang(ax, ay);
     cr = mag(cx, cy);                               // obtains magnitude of c stick value
     ls.l = constrain(gcc.left  - ini.l, 0, 255);    // fixes left trigger calibration
     ls.r = constrain(gcc.right - ini.r, 0, 255);    // fixes right trigger calibration
-    gcc.left = ls.l; gcc.right = ls.r;              // sets proper analog shield values
-    gcc.xAxis  = 128 + ax; gcc.yAxis  = 128 + ay;   // reports analog stick values
-    gcc.cxAxis = 128 + cx; gcc.cyAxis = 128 + cy;   // reports c stick values
-    recalibrate();                                  // allows holding x+y+start for 3 seconds to recalibrate
+    gcc.left  = ls.l; // sets proper analog shield values
+    gcc.right = ls.r;
+    gcc.xAxis  = 128 + ax; // reports analog stick values
+    gcc.yAxis  = 128 + ay;
+    gcc.cxAxis = 128 + cx; // reports c stick values
+    gcc.cyAxis = 128 + cy;
+    recalibrate(); // allows holding x+y+start for 3 seconds to recalibrate
 }
 
 static float ang(float x, float y) { return atan2(y, x)*57.3 + 360*(y < 0); }        // returns angle in degrees when given x and y components
@@ -302,8 +309,10 @@ void setup()
     g.w = ang(W_NOTCH_X, W_NOTCH_Y);          // calculates angle of W notch
     g.sw = ang(SW_NOTCH_X, SW_NOTCH_Y);       // calculates angle of SW notch
     g.se = ang(SE_NOTCH_X, SE_NOTCH_Y);       // calculates angle of SE notch
-    g.el = g.e-360*(g.e > 180); g.eh = g.e+360*(g.e < 180);  // gets east gate in 2 notations
-    controller.read(); gcc = controller.getReport();         // reads controller once for calibration
+    g.el = g.e - 360*(g.e > 180);  // gets east gate in 2 notations
+    g.eh = g.e + 360*(g.e < 180);
+    controller.read();             // reads controller once for calibration
+    gcc = controller.getReport();
     recalibrate();                                           // calibrates the controller for initial plug in
 }
 
@@ -312,9 +321,11 @@ void loop()
     controller.read();                          // reads the controller
     data = defaultGamecubeData;                 // this line is necessary for proper rumble
     gcc = controller.getReport();               // gets a report of the controller read
-    calibration(); recalibrate();               // fixes normal calibration and allows resetting with x+y+start
+    calibration();                              // fixes normal calibration
+    recalibrate();                              // allows resetting with x+y+start
     if (!off)
         mods();                                 // implements all the mods (remove this to unmod the controller)
-    data.report = gcc; console.write(data);     // sends controller data to the console
+    data.report = gcc;
+    console.write(data);                        // sends controller data to the console
     controller.setRumble(data.status.rumble);   // allows for rumble
 }
