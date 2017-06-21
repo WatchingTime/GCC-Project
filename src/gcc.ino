@@ -29,17 +29,17 @@
 // to return to a stock controller hold dpad down for 3 seconds
 // to set to dolphin mode hold dpad up for 3 seconds
 
-CGamecubeController controller(0); // sets RX0 on arduino to read data from controller
-CGamecubeConsole console(1);       // sets TX1 on arduino to write data to console
-Gamecube_Report_t gcc;             // structure for controller state
-Gamecube_Data_t data;
+static CGamecubeController controller(0); // sets RX0 on arduino to read data from controller
+static CGamecubeConsole console(1);       // sets TX1 on arduino to write data to console
+static Gamecube_Report_t gcc;             // structure for controller state
+static Gamecube_Data_t data;
 
-bool shield, dolphin, off, cal = 1, button;
-int8_t ax, ay, cx, cy;
-float r, deg, cr;
-uint8_t cycles = 3;
-uint16_t mode;
-uint32_t n, c;
+static bool shield, dolphin, off, cal = 1, button;
+static int8_t ax, ay, cx, cy;
+static float r, deg, cr;
+static uint8_t cycles = 3;
+static uint16_t mode;
+static uint32_t n, c;
 
 struct
 {
