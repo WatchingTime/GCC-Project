@@ -70,17 +70,17 @@ static struct
 
 static void mods()          // to remove mods delete any lines that you do not want here
 {
-    anglesfixed();   // reallocates angles properly based on the given cardinal notches
-    perfectangles(); // reduces deadzone of cardinals and gives steepest/shallowest angles when on or near the gate
-    maxvectors();    // snaps sufficiently high cardinal inputs to vectors of 1.0 magnitude of analog stick and c stick
-    shielddrops();   // gives an 8 degree range of shield dropping centered on SW and SE gates
-    backdash();      // fixes dashback by imposing a 1 frame buffer upon tilt turn values
-    backdashooc();   // allows more leniency for dash back out of crouch
-    dolphinfix();    // ensures close to 0 values are reported as 0 on the sticks to fix dolphin calibration and fixes poll speed issues
-    nocode();        // function to disable all code if dpad down is held for 3 seconds (unplug controller to reactivate)
+    angles_fixed();   // reallocates angles properly based on the given cardinal notches
+    perfect_angles(); // reduces deadzone of cardinals and gives steepest/shallowest angles when on or near the gate
+    max_vectors();    // snaps sufficiently high cardinal inputs to vectors of 1.0 magnitude of analog stick and c stick
+    shield_drops();   // gives an 8 degree range of shield dropping centered on SW and SE gates
+    backdash();       // fixes dashback by imposing a 1 frame buffer upon tilt turn values
+    backdash_ooc();   // allows more leniency for dash back out of crouch
+    dolphin_fix();    // ensures close to 0 values are reported as 0 on the sticks to fix dolphin calibration and fixes poll speed issues
+    no_code();        // function to disable all code if dpad down is held for 3 seconds (unplug controller to reactivate)
 } // more mods to come!
 
-static void anglesfixed()
+static void angles_fixed()
 {
     if (s_deg > s_g.el && s_deg < s_g.n)
         s_deg = map(s_deg, s_g.el, s_g.n, 0, 90);
@@ -100,7 +100,7 @@ static void anglesfixed()
     s_gcc.yAxis = 128 + s_r * sin(s_deg / 57.3);
 }
 
-static void perfectangles()
+static void perfect_angles()
 {
     if (s_r > 75)
     {
@@ -127,7 +127,7 @@ static void perfectangles()
     }
 }
 
-static void maxvectors()
+static void max_vectors()
 {
     if (s_r > 75)
     {
@@ -164,7 +164,7 @@ static void maxvectors()
     }
 }
 
-static void shielddrops()
+static void shield_drops()
 {
     s_shield = s_gcc.l || s_gcc.r || s_ls.l > 74 || s_ls.r > 74 || s_gcc.z;
     if (s_shield)
@@ -220,7 +220,7 @@ static void backdashooc()
         s_buf.cr = 0;
 }
 
-static void dolphinfix()
+static void dolphin_fix()
 {
     if (s_r < 8)
     {
@@ -239,7 +239,7 @@ static void dolphinfix()
     s_cycles = 3 + (16*s_dolphin);
 }
 
-static void nocode()
+static void no_code()
 {
     if (s_gcc.ddown)
     {
@@ -296,7 +296,7 @@ static void calibration()
 static float ang(float x, float y) { return atan2(y, x)*57.3 + 360*(y < 0); }        // returns angle in degrees when given x and y components
 static float mag(char x, char y) { return sqrt(sq(x) + sq(y)); }                     // returns vector magnitude when given x and y components
 static bool  mid(float val, float n1, float n2) { return val > n1 && val < n2; }     // returns whether val is between n1 and n2
-static float arc(float val) { return abs(180 - abs(abs(s_deg-val) - 180)); }           // returns length of arc between the s_deg and val
+static float arc(float val) { return abs(180 - abs(abs(s_deg-val) - 180)); }         // returns length of arc between the s_deg and val
 static int   dis(float val) { return abs(fmod(val, 90) - 90*(fmod(val, 90) > 45)); } // returns how far off the given angle is from a cardinal
 static float map(long val, float in, float ix, float on, float ox) { return (val-in)*(ox-on)/(ix-in)+on; }
 
@@ -318,9 +318,9 @@ void setup()
 
 void loop()
 {
-    s_controller.read();                          // reads the controller
-    s_data = defaultGamecubeData;                 // this line is necessary for proper rumble
-    s_gcc = s_controller.getReport();               // gets a report of the controller read
+    s_controller.read();                        // reads the controller
+    s_data = defaultGamecubeData;               // this line is necessary for proper rumble
+    s_gcc = s_controller.getReport();           // gets a report of the controller read
     calibration();                              // fixes normal calibration
     recalibrate();                              // allows resetting with x+y+start
     if (!s_off)
