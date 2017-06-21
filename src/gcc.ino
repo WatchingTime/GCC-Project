@@ -203,7 +203,7 @@ static void backdash()
         s_buf.db = 0;
 }
 
-static void backdashooc()
+static void backdash_ooc()
 {
     if (s_ay < 23)
     {
