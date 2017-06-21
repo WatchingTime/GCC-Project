@@ -21,6 +21,7 @@ build_cmd = [
     '-libraries', str(gcc_path / 'libraries'),
     '-build-path', str(gcc_path / '_out'),
     '-warnings', 'all',
+    '-prefs=build.extra_flags=-Werror',
     'src/gcc.ino',
 ]
 if args.verbose:
