@@ -26,7 +26,8 @@ build_cmd = [
 if args.verbose:
     build_cmd.insert(-1, '-verbose')
     print(' '.join(build_cmd))
-subprocess.run(build_cmd)
+if subprocess.run(build_cmd).returncode:
+    sys.exit()
 
 if args.port is None:
     sys.exit()
