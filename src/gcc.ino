@@ -272,17 +272,17 @@ static void recalibrate()
 
 static void calibration()
 {
-    ax = constrain(gcc.xAxis -128-ini.ax, -128, 127); // offsets from neutral position of analog stick x axis
-    ay = constrain(gcc.yAxis -128-ini.ay, -128, 127); // offsets from neutral position of analog stick y axis
-    cx = constrain(gcc.cxAxis-128-ini.cx, -128, 127); // offsets from neutral position of c stick x axis
-    cy = constrain(gcc.cyAxis-128-ini.cy, -128, 127); // offsets from neutral position of c stick y axis
+    ax = constrain(gcc.xAxis  - 128 - ini.ax, -128, 127); // offsets from neutral position of analog stick x axis
+    ay = constrain(gcc.yAxis  - 128 - ini.ay, -128, 127); // offsets from neutral position of analog stick y axis
+    cx = constrain(gcc.cxAxis - 128 - ini.cx, -128, 127); // offsets from neutral position of c stick x axis
+    cy = constrain(gcc.cyAxis - 128 - ini.cy, -128, 127); // offsets from neutral position of c stick y axis
     r  = mag(ax, ay); deg = ang(ax, ay);            // obtains polar coordinates for analog stick
     cr = mag(cx, cy);                               // obtains magnitude of c stick value
-    ls.l = constrain(gcc.left -ini.l, 0, 255);        // fixes left trigger calibration
-    ls.r = constrain(gcc.right-ini.r, 0, 255);        // fixes right trigger calibration
+    ls.l = constrain(gcc.left  - ini.l, 0, 255);    // fixes left trigger calibration
+    ls.r = constrain(gcc.right - ini.r, 0, 255);    // fixes right trigger calibration
     gcc.left = ls.l; gcc.right = ls.r;              // sets proper analog shield values
-    gcc.xAxis  = 128+ax; gcc.yAxis  = 128+ay;       // reports analog stick values
-    gcc.cxAxis = 128+cx; gcc.cyAxis = 128+cy;       // reports c stick values
+    gcc.xAxis  = 128 + ax; gcc.yAxis  = 128 + ay;   // reports analog stick values
+    gcc.cxAxis = 128 + cx; gcc.cyAxis = 128 + cy;   // reports c stick values
     recalibrate();                                  // allows holding x+y+start for 3 seconds to recalibrate
 }
 
