@@ -29,44 +29,44 @@
 // to return to a stock controller hold dpad down for 3 seconds
 // to set to dolphin mode hold dpad up for 3 seconds
 
-static CGamecubeController controller(0); // sets RX0 on arduino to read data from controller
-static CGamecubeConsole console(1);       // sets TX1 on arduino to write data to console
-static Gamecube_Report_t gcc;             // structure for controller state
-static Gamecube_Data_t data;
+static CGamecubeController s_controller(0); // sets RX0 on arduino to read data from controller
+static CGamecubeConsole s_console(1);       // sets TX1 on arduino to write data to console
+static Gamecube_Report_t s_gcc;             // structure for controller state
+static Gamecube_Data_t s_data;
 
-static bool shield, dolphin, off, cal = 1, button;
-static int8_t ax, ay, cx, cy;
-static float r, deg, cr;
-static uint8_t cycles = 3;
-static uint16_t mode;
-static uint32_t n, c;
+static bool s_shield, s_dolphin, s_off, s_cal = 1, s_button;
+static int8_t s_ax, s_ay, s_cx, s_cy;
+static float s_r, s_deg, s_cr;
+static uint8_t s_cycles = 3;
+static uint16_t s_mode;
+static uint32_t s_n, s_c;
 
-struct
+static struct
 {
     int8_t ax, ay, cx, cy;
     uint8_t l, r;
-} ini;
+} s_ini;
 
-struct
+static struct
 {
     float n, e, eh, el, s, w, se, sw;
-} g;
+} s_g;
 
-struct
+static struct
 {
     uint8_t db : 5;
     uint8_t cr : 5;
-} buf;
+} s_buf;
 
-struct
+static struct
 {
     bool u, d, l, r;
-} perf;
+} s_perf;
 
-struct
+static struct
 {
     uint8_t l, r;
-} ls;
+} s_ls;
 
 static void mods()          // to remove mods delete any lines that you do not want here
 {
@@ -82,104 +82,104 @@ static void mods()          // to remove mods delete any lines that you do not w
 
 static void anglesfixed()
 {
-    if (deg > g.el && deg < g.n)
-        deg = map(deg, g.el, g.n, 0, 90);
-    else if (deg > g.n && deg < g.w)
-        deg = map(deg, g.n, g.w, 90, 180);
-    else if (deg > g.w && deg < g.s)
-        deg = map(deg, g.w, g.s, 180, 270);
-    else if (deg > g.s && deg < g.eh)
-        deg = map(deg, g.s, g.eh, 270, 360);
+    if (s_deg > s_g.el && s_deg < s_g.n)
+        s_deg = map(s_deg, s_g.el, s_g.n, 0, 90);
+    else if (s_deg > s_g.n && s_deg < s_g.w)
+        s_deg = map(s_deg, s_g.n, s_g.w, 90, 180);
+    else if (s_deg > s_g.w && s_deg < s_g.s)
+        s_deg = map(s_deg, s_g.w, s_g.s, 180, 270);
+    else if (s_deg > s_g.s && s_deg < s_g.eh)
+        s_deg = map(s_deg, s_g.s, s_g.eh, 270, 360);
     else
-        deg = map(deg - g.eh, g.el, g.n, 0, 90);
-    perf.u = deg > 73 && deg < 107;
-    perf.d = deg > 254 && deg < 287;
-    perf.l = deg > 163 && deg < 197;
-    perf.r = deg > 343 || deg < 17;
-    gcc.xAxis = 128 + r * cos(deg / 57.3);
-    gcc.yAxis = 128 + r * sin(deg / 57.3);
+        s_deg = map(s_deg - s_g.eh, s_g.el, s_g.n, 0, 90);
+    s_perf.u = s_deg > 73 && s_deg < 107;
+    s_perf.d = s_deg > 254 && s_deg < 287;
+    s_perf.l = s_deg > 163 && s_deg < 197;
+    s_perf.r = s_deg > 343 || s_deg < 17;
+    s_gcc.xAxis = 128 + s_r * cos(s_deg / 57.3);
+    s_gcc.yAxis = 128 + s_r * sin(s_deg / 57.3);
 }
 
 static void perfectangles()
 {
-    if (r > 75)
+    if (s_r > 75)
     {
-        if (perf.u)
+        if (s_perf.u)
         {
-            gcc.xAxis = (ax > 0) ? 151 : 105;
-            gcc.yAxis = 204;
+            s_gcc.xAxis = (s_ax > 0) ? 151 : 105;
+            s_gcc.yAxis = 204;
         }
-        if (perf.r)
+        if (s_perf.r)
         {
-            gcc.yAxis = (ay > 0) ? 151 : 105;
-            gcc.xAxis = 204;
+            s_gcc.yAxis = (s_ay > 0) ? 151 : 105;
+            s_gcc.xAxis = 204;
         }
-        if (perf.d)
+        if (s_perf.d)
         {
-            gcc.xAxis = (ax > 0) ? 151 : 105;
-            gcc.yAxis = 52;
+            s_gcc.xAxis = (s_ax > 0) ? 151 : 105;
+            s_gcc.yAxis = 52;
         }
-        if (perf.l)
+        if (s_perf.l)
         {
-            gcc.yAxis = (ay > 0) ? 151 : 105;
-            gcc.xAxis = 52;
+            s_gcc.yAxis = (s_ay > 0) ? 151 : 105;
+            s_gcc.xAxis = 52;
         }
     }
 }
 
 static void maxvectors()
 {
-    if (r > 75)
+    if (s_r > 75)
     {
-        if (arc(g.n) < 6)
+        if (arc(s_g.n) < 6)
         {
-            gcc.xAxis = 128;
-            gcc.yAxis = 255;
+            s_gcc.xAxis = 128;
+            s_gcc.yAxis = 255;
         }
-        if (arc(g.e) < 6)
+        if (arc(s_g.e) < 6)
         {
-            gcc.xAxis = 255;
-            gcc.yAxis = 128;
+            s_gcc.xAxis = 255;
+            s_gcc.yAxis = 128;
         }
-        if (arc(g.s) < 6)
+        if (arc(s_g.s) < 6)
         {
-            gcc.xAxis = 128;
-            gcc.yAxis = 1;
+            s_gcc.xAxis = 128;
+            s_gcc.yAxis = 1;
         }
-        if (arc(g.w) < 6)
+        if (arc(s_g.w) < 6)
         {
-            gcc.xAxis = 1;
-            gcc.yAxis = 128;
+            s_gcc.xAxis = 1;
+            s_gcc.yAxis = 128;
         }
     }
-    if (abs(cx) > 75 && abs(cy) < 23)
+    if (abs(s_cx) > 75 && abs(s_cy) < 23)
     {
-        gcc.cxAxis = (cx > 0) ? 255 : 1;
-        gcc.cyAxis = 128;
+        s_gcc.cxAxis = (s_cx > 0) ? 255 : 1;
+        s_gcc.cyAxis = 128;
     }
-    if (abs(cy) > 75 && abs(cx) < 23)
+    if (abs(s_cy) > 75 && abs(s_cx) < 23)
     {
-        gcc.cyAxis = (cy > 0) ? 255 : 1;
-        gcc.cxAxis = 128;
+        s_gcc.cyAxis = (s_cy > 0) ? 255 : 1;
+        s_gcc.cxAxis = 128;
     }
 }
 
 static void shielddrops()
 {
-    shield = gcc.l || gcc.r || ls.l > 74 || ls.r > 74 || gcc.z;
-    if (shield)
+    s_shield = s_gcc.l || s_gcc.r || s_ls.l > 74 || s_ls.r > 74 || s_gcc.z;
+    if (s_shield)
     {
-        if (ay < 0 && r > 72)
+        if (s_ay < 0 && s_r > 72)
         {
-            if (arc(g.sw) < 4)
+            if (arc(s_g.sw) < 4)
             {
-                gcc.yAxis = 73;
-                gcc.xAxis = 73;
+                s_gcc.yAxis = 73;
+                s_gcc.xAxis = 73;
             }
-            if (arc(g.se) < 4)
+            if (arc(s_g.se) < 4)
             {
-                gcc.yAxis = 73;
-                gcc.xAxis = 183;
+                s_gcc.yAxis = 73;
+                s_gcc.xAxis = 183;
             }
         }
     }
@@ -187,145 +187,145 @@ static void shielddrops()
 
 static void backdash()
 {
-    button = gcc.a || gcc.b || gcc.x || gcc.y || gcc.z || gcc.l || gcc.r || ls.l > 74 || ls.r > 74;
-    if (abs(ay) < 23 && !button)
+    s_button = s_gcc.a || s_gcc.b || s_gcc.x || s_gcc.y || s_gcc.z || s_gcc.l || s_gcc.r || s_ls.l > 74 || s_ls.r > 74;
+    if (abs(s_ay) < 23 && !s_button)
     {
-        if (abs(ax) < 23)
-            buf.db = cycles;
-        if (buf.db > 0)
+        if (abs(s_ax) < 23)
+            s_buf.db = s_cycles;
+        if (s_buf.db > 0)
         {
-            buf.db--;
-            if (abs(ax) < 64)
-                gcc.xAxis = 128+ax*(abs(ax) < 23);
+            s_buf.db--;
+            if (abs(s_ax) < 64)
+                s_gcc.xAxis = 128+s_ax*(abs(s_ax) < 23);
         }
     }
     else
-        buf.db = 0;
+        s_buf.db = 0;
 }
 
 static void backdashooc()
 {
-    if (ay < 23)
+    if (s_ay < 23)
     {
-        if (ay < -49)
-            buf.cr = cycles;
-        if (buf.cr > 0)
+        if (s_ay < -49)
+            s_buf.cr = s_cycles;
+        if (s_buf.cr > 0)
         {
-            buf.cr--;
-            if (ay > -50)
-                gcc.yAxis = 78;
+            s_buf.cr--;
+            if (s_ay > -50)
+                s_gcc.yAxis = 78;
         }
     }
     else
-        buf.cr = 0;
+        s_buf.cr = 0;
 }
 
 static void dolphinfix()
 {
-    if (r < 8)
+    if (s_r < 8)
     {
-        gcc.xAxis = 128;
-        gcc.yAxis = 128;
+        s_gcc.xAxis = 128;
+        s_gcc.yAxis = 128;
     }
-    if (mag(cx, cy) < 8)
+    if (mag(s_cx, s_cy) < 8)
     {
-        gcc.cxAxis = 128;
-        gcc.cyAxis = 128;
+        s_gcc.cxAxis = 128;
+        s_gcc.cyAxis = 128;
     }
-    if (gcc.dup && mode < 1500)
-        dolphin = dolphin || (mode++ > 1000);
+    if (s_gcc.dup && s_mode < 1500)
+        s_dolphin = s_dolphin || (s_mode++ > 1000);
     else
-        mode = 0;
-    cycles = 3 + (16*dolphin);
+        s_mode = 0;
+    s_cycles = 3 + (16*s_dolphin);
 }
 
 static void nocode()
 {
-    if (gcc.ddown)
+    if (s_gcc.ddown)
     {
-        if (n == 0)
-            n = millis();
-        off = off || (millis()-n > 500);
+        if (s_n == 0)
+            s_n = millis();
+        s_off = s_off || (millis() - s_n > 500);
     }
     else
-        n = 0;
+        s_n = 0;
 }
 
 static void recalibrate()
 {
-    if (cal)
+    if (s_cal)
     {
-        cal = gcc.x && gcc.y && gcc.start;
-        ini.ax = gcc.xAxis - 128; // gets offset from analog stick in neutral
-        ini.ay = gcc.yAxis - 128;
-        ini.cx = gcc.cxAxis - 128; // gets offset from c stick in neutral
-        ini.cy = gcc.cyAxis - 128;
-        ini.l = gcc.left; // gets offset from analog triggers in neutral
-        ini.r = gcc.right;
+        s_cal = s_gcc.x && s_gcc.y && s_gcc.start;
+        s_ini.ax = s_gcc.xAxis - 128; // gets offset from analog stick in neutral
+        s_ini.ay = s_gcc.yAxis - 128;
+        s_ini.cx = s_gcc.cxAxis - 128; // gets offset from c stick in neutral
+        s_ini.cy = s_gcc.cyAxis - 128;
+        s_ini.l = s_gcc.left; // gets offset from analog triggers in neutral
+        s_ini.r = s_gcc.right;
     }
-    else if (gcc.x && gcc.y && gcc.start)
+    else if (s_gcc.x && s_gcc.y && s_gcc.start)
     {
-        if (c == 0)
-            c = millis();
-        cal = millis() - c > 500;
+        if (s_c == 0)
+            s_c = millis();
+        s_cal = millis() - s_c > 500;
     }
     else
-        c = 0;
+        s_c = 0;
 }
 
 static void calibration()
 {
-    ax = constrain(gcc.xAxis  - 128 - ini.ax, -128, 127); // offsets from neutral position of analog stick x axis
-    ay = constrain(gcc.yAxis  - 128 - ini.ay, -128, 127); // offsets from neutral position of analog stick y axis
-    cx = constrain(gcc.cxAxis - 128 - ini.cx, -128, 127); // offsets from neutral position of c stick x axis
-    cy = constrain(gcc.cyAxis - 128 - ini.cy, -128, 127); // offsets from neutral position of c stick y axis
-    r = mag(ax, ay); // obtains polar coordinates for analog stick
-    deg = ang(ax, ay);
-    cr = mag(cx, cy);                               // obtains magnitude of c stick value
-    ls.l = constrain(gcc.left  - ini.l, 0, 255);    // fixes left trigger calibration
-    ls.r = constrain(gcc.right - ini.r, 0, 255);    // fixes right trigger calibration
-    gcc.left  = ls.l; // sets proper analog shield values
-    gcc.right = ls.r;
-    gcc.xAxis  = 128 + ax; // reports analog stick values
-    gcc.yAxis  = 128 + ay;
-    gcc.cxAxis = 128 + cx; // reports c stick values
-    gcc.cyAxis = 128 + cy;
+    s_ax = constrain(s_gcc.xAxis  - 128 - s_ini.ax, -128, 127); // offsets from neutral position of analog stick x axis
+    s_ay = constrain(s_gcc.yAxis  - 128 - s_ini.ay, -128, 127); // offsets from neutral position of analog stick y axis
+    s_cx = constrain(s_gcc.cxAxis - 128 - s_ini.cx, -128, 127); // offsets from neutral position of c stick x axis
+    s_cy = constrain(s_gcc.cyAxis - 128 - s_ini.cy, -128, 127); // offsets from neutral position of c stick y axis
+    s_r = mag(s_ax, s_ay); // obtains polar coordinates for analog stick
+    s_deg = ang(s_ax, s_ay);
+    s_cr = mag(s_cx, s_cy);                               // obtains magnitude of c stick value
+    s_ls.l = constrain(s_gcc.left  - s_ini.l, 0, 255);    // fixes left trigger calibration
+    s_ls.r = constrain(s_gcc.right - s_ini.r, 0, 255);    // fixes right trigger calibration
+    s_gcc.left  = s_ls.l; // sets proper analog shield values
+    s_gcc.right = s_ls.r;
+    s_gcc.xAxis  = 128 + s_ax; // reports analog stick values
+    s_gcc.yAxis  = 128 + s_ay;
+    s_gcc.cxAxis = 128 + s_cx; // reports c stick values
+    s_gcc.cyAxis = 128 + s_cy;
     recalibrate(); // allows holding x+y+start for 3 seconds to recalibrate
 }
 
 static float ang(float x, float y) { return atan2(y, x)*57.3 + 360*(y < 0); }        // returns angle in degrees when given x and y components
 static float mag(char x, char y) { return sqrt(sq(x) + sq(y)); }                     // returns vector magnitude when given x and y components
 static bool  mid(float val, float n1, float n2) { return val > n1 && val < n2; }     // returns whether val is between n1 and n2
-static float arc(float val) { return abs(180 - abs(abs(deg-val) - 180)); }           // returns length of arc between the deg and val
+static float arc(float val) { return abs(180 - abs(abs(s_deg-val) - 180)); }           // returns length of arc between the s_deg and val
 static int   dis(float val) { return abs(fmod(val, 90) - 90*(fmod(val, 90) > 45)); } // returns how far off the given angle is from a cardinal
 static float map(long val, float in, float ix, float on, float ox) { return (val-in)*(ox-on)/(ix-in)+on; }
 
 void setup()
 {
-    gcc.origin = gcc.errlatch = gcc.high1 = gcc.errstat = 0; // init values
-    g.n = ang(N_NOTCH_X, N_NOTCH_Y);          // calculates angle of N notch
-    g.e = ang(E_NOTCH_X, E_NOTCH_Y);          // calculates angle of E notch
-    g.s = ang(S_NOTCH_X, S_NOTCH_Y);          // calculates angle of S notch
-    g.w = ang(W_NOTCH_X, W_NOTCH_Y);          // calculates angle of W notch
-    g.sw = ang(SW_NOTCH_X, SW_NOTCH_Y);       // calculates angle of SW notch
-    g.se = ang(SE_NOTCH_X, SE_NOTCH_Y);       // calculates angle of SE notch
-    g.el = g.e - 360*(g.e > 180);  // gets east gate in 2 notations
-    g.eh = g.e + 360*(g.e < 180);
-    controller.read();             // reads controller once for calibration
-    gcc = controller.getReport();
+    s_gcc.origin = s_gcc.errlatch = s_gcc.high1 = s_gcc.errstat = 0; // init values
+    s_g.n = ang(N_NOTCH_X, N_NOTCH_Y);          // calculates angle of N notch
+    s_g.e = ang(E_NOTCH_X, E_NOTCH_Y);          // calculates angle of E notch
+    s_g.s = ang(S_NOTCH_X, S_NOTCH_Y);          // calculates angle of S notch
+    s_g.w = ang(W_NOTCH_X, W_NOTCH_Y);          // calculates angle of W notch
+    s_g.sw = ang(SW_NOTCH_X, SW_NOTCH_Y);       // calculates angle of SW notch
+    s_g.se = ang(SE_NOTCH_X, SE_NOTCH_Y);       // calculates angle of SE notch
+    s_g.el = s_g.e - 360*(s_g.e > 180);  // gets east gate in 2 notations
+    s_g.eh = s_g.e + 360*(s_g.e < 180);
+    s_controller.read();             // reads controller once for calibration
+    s_gcc = s_controller.getReport();
     recalibrate();                                           // calibrates the controller for initial plug in
 }
 
 void loop()
 {
-    controller.read();                          // reads the controller
-    data = defaultGamecubeData;                 // this line is necessary for proper rumble
-    gcc = controller.getReport();               // gets a report of the controller read
+    s_controller.read();                          // reads the controller
+    s_data = defaultGamecubeData;                 // this line is necessary for proper rumble
+    s_gcc = s_controller.getReport();               // gets a report of the controller read
     calibration();                              // fixes normal calibration
     recalibrate();                              // allows resetting with x+y+start
-    if (!off)
+    if (!s_off)
         mods();                                 // implements all the mods (remove this to unmod the controller)
-    data.report = gcc;
-    console.write(data);                        // sends controller data to the console
-    controller.setRumble(data.status.rumble);   // allows for rumble
+    s_data.report = s_gcc;
+    s_console.write(s_data);                        // sends controller data to the console
+    s_controller.setRumble(s_data.status.rumble);   // allows for rumble
 }
