@@ -2,13 +2,22 @@
 from pathlib import Path
 import argparse
 import subprocess
+import platform
 import sys
 
+is_windows = platform.system() == 'Windows'
+
 parser = argparse.ArgumentParser()
+parser.add_argument('-a', '--arduino-path', type=Path, required=not is_windows, help='Arduino IDE path')
 parser.add_argument('-p', '--port')
 parser.add_argument('-v', '--verbose', action='store_true')
-parser.add_argument('arduino_path', type=Path)
 args = parser.parse_args()
+
+if args.arduino_path is None:
+    assert is_windows
+    args.arduino_path = Path(r'C:\Program Files (x86)\Arduino')
+if not args.arduino_path.exists():
+    sys.exit('Arduino IDE not found at "%s"; specify using --arduino-path' % args.arduino_path)
 
 gcc_path = Path(__file__).resolve().parent
 Path.mkdir(gcc_path / '_out', exist_ok=True)
