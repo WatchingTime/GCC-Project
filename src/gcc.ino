@@ -10,8 +10,18 @@
 #define PIN_CONSOLE 1
 #endif
 
-static CGamecubeController s_controller(PIN_CONTROLLER);
+class CGamecubeControllerModded : public CGamecubeController {
+public:
+    inline CGamecubeControllerModded(const uint8_t p) : CGamecubeController(p) {}
+    inline void mod(void);
+};
+
+static CGamecubeControllerModded s_controller(PIN_CONTROLLER);
 static CGamecubeConsole s_console(PIN_CONSOLE);
+
+void CGamecubeControllerModded::mod(void)
+{
+}
 
 void setup()
 {
@@ -25,6 +35,7 @@ void loop()
 {
     if (s_controller.read())
     {
+        s_controller.mod();
         if (!s_console.write(s_controller))
         {
 #if USE_SERIAL
