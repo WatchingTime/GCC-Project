@@ -2,6 +2,12 @@
 
 #define USE_SERIAL 0
 
+#define SW_NOTCH_X 56
+#define SW_NOTCH_Y 60
+
+#define SE_NOTCH_X 206
+#define SE_NOTCH_Y 54
+
 #if USE_SERIAL
 #define PIN_CONTROLLER 2
 #define PIN_CONSOLE 3
@@ -21,6 +27,19 @@ static CGamecubeConsole s_console(PIN_CONSOLE);
 
 void CGamecubeControllerModded::mod(void)
 {
+    if (report.l || report.r || report.left > 74 || report.right > 74)
+    {
+        if (report.xAxis > (SW_NOTCH_X - 2) && report.xAxis < (SW_NOTCH_X + 2) && report.yAxis > (SW_NOTCH_Y - 2) && report.yAxis < (SW_NOTCH_Y + 2))
+        {
+            report.xAxis = origin.inititalData.xAxis - 55;
+            report.yAxis = origin.inititalData.yAxis - 55;
+        }
+        else if (report.xAxis > (SE_NOTCH_X - 2) && report.xAxis < (SE_NOTCH_X + 2) && report.yAxis > (SE_NOTCH_Y - 2) && report.yAxis < (SE_NOTCH_Y + 2))
+        {
+            report.xAxis = origin.inititalData.xAxis + 55;
+            report.yAxis = origin.inititalData.yAxis - 55;
+        }
+    }
 }
 
 void setup()
