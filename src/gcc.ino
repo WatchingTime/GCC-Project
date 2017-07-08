@@ -58,7 +58,7 @@ void loop()
         if (!s_console.write(s_controller))
         {
 #if USE_SERIAL
-            Serial.println(F("Error writing controller"));
+            Serial.println(F("Error writing to console"));
 #endif
             digitalWrite(LED_BUILTIN, HIGH);
             delay(1000);
